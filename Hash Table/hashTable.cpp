@@ -9,6 +9,7 @@
 
 using namespace std;
 
+//function prototypes
 void addFunc(Node** &studentList, int size);
 void delFunc(Node* head, Node* &current, int id);
 void printFunc(Node** &studentList, int size);
@@ -17,6 +18,7 @@ int hashFunc(int studentID, int size);
 void debugPrint(Node** studentList, int size);
 
 int main(){
+  //initialization
   Node** students = new Node*[101];
   int size = 101;
   char command[10];
@@ -27,18 +29,20 @@ int main(){
     students[i] = NULL;
   }
   int randStudentID = 1;
+
+  //looking for a command
   while(strcmp(command, "QUIT") != 0){
     cout << "Type in a command (ADD, PRINT, DELETE, QUIT)" << endl;
     cin >> command;
-    if(strcmp(command, "ADD") == 0){
+    if(strcmp(command, "ADD") == 0){//if they would like to add a student
       cout << "How would you like to add your student? (RANDOM, INPUT)" << endl;
       char addCom[10];
       cin >> addCom;
-      if(strcmp(addCom, "RANDOM") == 0){
+      if(strcmp(addCom, "RANDOM") == 0){//if they want to add a random student
 	cout << "how many students would you like to add?"<< endl;
 	int numStudents;
 	cin >> numStudents;
-	for(int i = 0; i<numStudents;i++){
+	for(int i = 0; i<numStudents;i++){//adding random students
 	  int firstNameNo = rand()%100 +1;
 	  int lastNameNo = rand()%100 +1;
 	  Student* newStudent = new Student();
@@ -62,7 +66,7 @@ int main(){
 	  newStudent->setID(randStudentID);
 	  int location = hashFunc(randStudentID, size);
 	  Node* newNode = new Node(newStudent);
-	  if(students[location] == NULL){
+	  if(students[location] == NULL){//adding the students into the hashtable
 	    students[location] = newNode;
 	  }else{
 	    Node* temp = students[location]->getNext();
@@ -77,11 +81,12 @@ int main(){
 	  lastNameFile.open("LastNames.txt");
 	  
 	}
-      }else if(strcmp(addCom, "INPUT") == 0){
+      }else if(strcmp(addCom, "INPUT") == 0){//if you want to input a student
 	addFunc(students, size);
       }else{
 	cout << "that was not a valid choice, try again later" << endl;
       }
+      //rehashing
       for(int i = 0; i<size;i++){
 	int chainLen = 1;
 	if(students[i] != NULL){
@@ -97,9 +102,9 @@ int main(){
 	}
       }
 
-    }else if(strcmp(command, "PRINT") == 0){
+    }else if(strcmp(command, "PRINT") == 0){//if you want to print all your students
       printFunc(students, size);
-    }else if(strcmp(command, "DELETE") == 0){
+    }else if(strcmp(command, "DELETE") == 0){//if you want to delete your students
       cout << "what is the id of the student you would like to delete?" << endl;
       int id = -1;
       cin >> id;
@@ -107,7 +112,7 @@ int main(){
       delFunc(students[key], students[key], key);
     }else if(strcmp(command, "QUIT") == 0){
 
-    }else if(strcmp(command, "DEBUG") == 0){
+    }else if(strcmp(command, "DEBUG") == 0){//debugging thing
       debugPrint(students, size);
     }else{
       cout << "that is not a valid command, make sure all letters are capital";
@@ -116,10 +121,12 @@ int main(){
   }
 }
 
+//hash function
 int hashFunc(int studentID, int size){
   return studentID % size;
 }
 
+//adding a student
 void addFunc(Node** &studentList, int size){
   Student* newStudent = new Student();
 
@@ -145,6 +152,7 @@ void addFunc(Node** &studentList, int size){
   
 }
 
+//printing out students and their info
 void printFunc(Node** &studentList, int size){
   for(int i = 0; i< size;i++){
     if(studentList[i] != NULL){
@@ -160,6 +168,7 @@ void printFunc(Node** &studentList, int size){
   }
 }
 
+//deleting a student
 void delFunc(Node* head, Node* &current, int id){
   if(head == NULL){//if the list is empty
     cout<< "you have no students"<<endl;
@@ -181,34 +190,41 @@ void delFunc(Node* head, Node* &current, int id){
   }
 }
 
+//rehashing
 void rehashFunc(Node** &studentList, int &size){
+  //creating a new hashtable
   int oldSize = size;
-  size= size*7;
+  size=size*7;
   Node** temp = new Node*[size];
   for(int i = 0; i<size;i++){
     temp[i] = NULL;
   }
+
+  //transferring the students over
   for(int i = 0;i<oldSize;i++){
     if(studentList[i] != NULL){
       Node* current = studentList[i];
       while(current != NULL){
-	int newLoc = hashFunc(*current->getStudent()->getID(), size);
-	if(temp[newLoc] == NULL){
-	  temp[newLoc] = current;
-	}else{
-	  Node* tempNode = temp[newLoc]->getNext();
-	  Node* newNode = current;
-	  newNode->setNext(tempNode);
-	  temp[newLoc]->setNext(newNode);
-	}
-	current = current->getNext();
+        Node* tempnew = new Node(current -> getStudent());
+        int newLoc = hashFunc(*current->getStudent()->getID(), size);
+        if(temp[newLoc] == NULL){
+          temp[newLoc] = tempnew;
+        }else{
+          Node* tempNode = temp[newLoc]->getNext();
+          Node* newNode = tempnew;
+          tempnew->setNext(tempNode);
+          temp[newLoc]->setNext(tempnew);
+        }
+        current = current->getNext();
       }
     }
   }
+  delete[] studentList;
   studentList = temp;
-  
+
 }
 
+//debugging
 void debugPrint(Node** studentList, int size){
   for(int i = 0;i<size;i++){
     if(studentList[i] != NULL){
