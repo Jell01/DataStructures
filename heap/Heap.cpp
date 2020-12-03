@@ -3,11 +3,15 @@
 #include <fstream>
 
 using namespace std;
+
+// function prototypes
 void heapify(int* heap, int size, int node);
 void heapSort(int* heap, int size);
 void deleteFunc(int* heap, int toDelete);
 void printFunc(int* heap, int location, int space);
+
 int main(){
+  //initialization
   int size = 0;
   int* heap = new int[100];
   for(int i = 0;i<100;i++){
@@ -17,30 +21,22 @@ int main(){
   cout << "how would you like to input your numbers?" <<endl;
   cout << "type 'F' for file input or 'U' for user input" << endl;
   cin >> input;
-  if(input == 'F'){
+  
+  if(input == 'F'){//getting file input
     cout << "what is your file name?" << endl;
     char fileName[80];
     cin >> fileName;
     ifstream numFile;
     numFile.open(fileName);
     int count = 0;
-    /*for(int i =0;i<100;i++){
-      numFile>>temp;
-      if(temp == 0){
-	break;
-      }
-      numFile >> heap[i];
-      size++;
-      }*/
     while(numFile >> heap[count]){
-      numFile >> heap[count];
       cout << heap[count] << endl;
       size++;
       count++;
     }
     numFile.close();
     heapSort(heap, 100);
-  }else if(input == 'U'){
+  }else if(input == 'U'){//getting user input
     int inputNo = 0;
     for(int i = 0;i<100;i++){
       cout << "enter a number between 1 and 1000 into the heap or -1 to quit";
@@ -57,9 +53,12 @@ int main(){
   }else{
     cout << "that wasn't a valid format" << endl;
   }
+  
   for(int i = 0;i<100;i++){
     cout << heap[i] << " ";
   }
+
+  //asking for a command
   char command[80] = "cont";
   while(strcmp(command, "QUIT") != 0){
     cout << "what would you like to do: (ADD, DELETE, PRINT)" << endl;
@@ -70,6 +69,7 @@ int main(){
       }else{
 	cin >> heap[size];
 	size++;
+	heapSort(heap, 100);
       }
     }else if(strcmp(command, "DELETE") == 0){
       int deleteNum = 0;
@@ -86,6 +86,8 @@ int main(){
   }
 }
 
+//the heapify and heapSort functions were made with psuedo code provided by http://www.crazyforcode.com/heap-data-structure/://www.crazyforcode.com/heap-data-structure/~
+//swapping nodes if it's larger than parent
 void heapify(int* heap, int size, int node){
   int largest = node;
   int l = 2*node+1;
@@ -103,6 +105,8 @@ void heapify(int* heap, int size, int node){
   }
 }
 
+
+//checking that every node is not smaller than it's children 
 void heapSort(int* heap, int size){
   for(int i = size/2 - 1;i>=0;i--){
     heapify(heap, size, i);
@@ -113,6 +117,7 @@ void heapSort(int* heap, int size){
   }
 }
 
+//deleting a number
 void deleteFunc(int* heap, int toDelete){
   for(int i = 0;i<100;i++){
     if(heap[i] == toDelete){
@@ -122,6 +127,8 @@ void deleteFunc(int* heap, int toDelete){
   }
   heapSort(heap, 100);
 }
+
+//printing it out in a tree shape
  void printFunc(int* heap, int location, int space){
   if(heap[location] == 0){
     return;
