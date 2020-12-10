@@ -55,11 +55,12 @@ int main(){
       }
       pop(stackHead);
     }else if(!isdigit(currChar[0])){
-      while((stackHead->next !=NULL) &&
-          ((findPrecedence(stackHead->next->value[0]) > findPrecedence(currChar[0])) ||
-	   ((findPrecedence(stackHead->next->value[0]) == findPrecedence(currChar[0])) && currChar[0] != '^'))){
+      while((stackHead !=NULL) &&
+          ((findPrecedence(stackHead->value[0]) > findPrecedence(currChar[0])) ||
+	   ((findPrecedence(stackHead->value[0]) == findPrecedence(currChar[0])) && currChar[0] != '^'))){
 	enqueue(pop(stackHead)->value, queueHead);
       }
+      cout << "team" << endl;
       push(currChar, stackHead);
 	   
     }
@@ -93,22 +94,28 @@ int findPrecedence(char sign){
 }
 
 void enqueue(char* num, Node* &head){
-  Node* newNode = new Node(num);
   cout <<*num<< endl;
-  Node* current = head;
   cout << "yks" << endl;
   if(head == NULL){
+    Node* newNode = new Node(num);
+    cout <<"head is empty" << endl;
     head = newNode;
-    return;
+    //  return;
+  }else{
+    enqueue(num, head->next);
   }
+  /*
   cout <<"seg gaulting at " << newNode->value << endl;
   while(current->next != NULL){
     cout << "passes" << endl;
-    //cout << "currVal "  << current->value<< endl;
+    cout << "currVal "  << current->value<< endl;
     current = current->next;
     cout << "gone through" << endl;
   }
   current->next = newNode;
+  cout << current->value;
+  cout << " " << current->next->value;
+  */
 }
 
 void dequeue(Node* &head){
@@ -119,11 +126,14 @@ void dequeue(Node* &head){
 
 void push(char* operation, Node* &head){
   Node* newNode = new Node(operation);
-  newNode->value = operation;
-  newNode->next = NULL;
-  Node* temp = head->next;
-  head->next = newNode;
-  newNode->next = temp;
+  if(head == NULL){
+    head = newNode;
+    
+  }else{
+    Node* temp = head->next;
+    head->next = newNode;
+    newNode->next = temp;
+  }
 }
 
 Node* pop(Node* &sHead){
