@@ -36,34 +36,51 @@ int main(){
   char* currChar = new char[80];
   
   while(cin >> currChar){
-    cout << "ran through" << endl;
+    cout << "ran through ";
     cout << *currChar << endl;
 
-    if(strcmp(currChar, "=")==0) break;
-    cout << *currChar << endl;
+    if(strcmp(currChar, "=")==0){
+      break;
+    }
+    //cout << *currChar << endl;
     if(isdigit(currChar[0])){
+      char* cc = strdup(currChar);
       //cout << "working" << endl;
-      enqueue(currChar, queueHead);
+      enqueue(cc, queueHead);
       cout << "printing new queue ";
       printIt(queueHead);
     }else if(strcmp(currChar, "(")== 0){
-      push(currChar, stackHead);
+      char* pa = strdup(currChar);
+      cout << "came here" << endl;
+      push(pa, stackHead);
     }else if(strcmp(currChar, ")") == 0){
+      cout << "came here 2 " << endl;
       Node* current = stackHead;
-      while(strcmp(current->value, ")") !=0){
+      cout <<"printing stack ";
+      printIt(stackHead);
+      while(strcmp(current->value, "(") !=0){
 	enqueue(pop(stackHead)->value, queueHead);
+	cout << "looped" << endl;
       }
+      cout << stackHead->value << endl;
       pop(stackHead);
     }else if(!isdigit(currChar[0])){
+      cout << "came here 3 " << endl;
       while((stackHead !=NULL) &&
           ((findPrecedence(stackHead->value[0]) > findPrecedence(currChar[0])) ||
-	   ((findPrecedence(stackHead->value[0]) == findPrecedence(currChar[0])) && currChar[0] != '^'))){
+	   ((findPrecedence(stackHead->value[0]) == findPrecedence(currChar[0])) && currChar[0] != '^')) &&
+	    (stackHead->value[0] != '(')){
+	cout << "popping" << endl;
 	enqueue(pop(stackHead)->value, queueHead);
       }
-      cout << "team" << endl;
-      push(currChar, stackHead);
+      char* op = strdup(currChar);
+      cout << "Team" << endl;
+      push(op, stackHead);
 	   
     }
+  }
+  while(stackHead != NULL){
+    enqueue(pop(stackHead)->value, queueHead);
   }
   cout << "made it" << endl;
   printIt(queueHead);
@@ -76,6 +93,7 @@ void printIt(Node* aNode){
     cout << *current->value << " ";
     current = current->next;
   }
+  cout << endl;
 
 }
 int findPrecedence(char sign){
@@ -100,9 +118,12 @@ void enqueue(char* num, Node* &head){
     Node* newNode = new Node(num);
     cout <<"head is empty" << endl;
     head = newNode;
-    //  return;
+    cout << "works" << endl;
+    return;
   }else{
+    cout << *head->value << endl;
     enqueue(num, head->next);
+    
   }
   /*
   cout <<"seg gaulting at " << newNode->value << endl;
@@ -130,17 +151,18 @@ void push(char* operation, Node* &head){
     head = newNode;
     
   }else{
-    Node* temp = head->next;
-    head->next = newNode;
+    Node* temp = head;
     newNode->next = temp;
+    head = newNode;
   }
 }
 
 Node* pop(Node* &sHead){
-  Node* newNext = sHead->next->next;
-  Node* tbMoved = sHead->next;
+  cout << sHead->value << endl;
+  Node* newNext = sHead->next;
+  Node* tbMoved = sHead;
   tbMoved->next= NULL;
-  delete(sHead->next);
-  sHead->next= newNext;
+  sHead = newNext;
   return tbMoved;
 }
+
