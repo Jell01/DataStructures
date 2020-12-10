@@ -4,9 +4,13 @@
 struct Node{
   char* value;
   Node* next;
+  Node(char* newVal){
+    value = newVal;
+    next = NULL;
+  }
 };
 
-void enqueue(char* num, Node* head, Node* rear);
+void enqueue(char* num, Node* &head);
 void dequeue(Node* &head);
 void push(char* operation, Node* &head);
 Node* pop(Node* &sHead);
@@ -25,7 +29,6 @@ int main(){
   queueHead->next = NULL;
   */
   Node* queueHead = NULL;
-  Node* queueRear = NULL;
   Node* stackHead = NULL;
   cout << "enter an equation with spaces between everything" << endl;
   cout << "please type an equals sign at the end so the program runs properly" << endl;
@@ -40,7 +43,7 @@ int main(){
     cout << *currChar << endl;
     if(isdigit(currChar[0])){
       //cout << "working" << endl;
-      enqueue(currChar, queueHead, queueRear);
+      enqueue(currChar, queueHead);
       cout << "printing new queue ";
       printIt(queueHead);
     }else if(strcmp(currChar, "(")== 0){
@@ -89,16 +92,12 @@ int findPrecedence(char sign){
   return 5;
 }
 
-void enqueue(char* num, Node* head){
-  Node* newNode = new Node();
+void enqueue(char* num, Node* &head){
+  Node* newNode = new Node(num);
   cout <<*num<< endl;
-  newNode->value = num;
-  newNode->next = NULL;
   Node* current = head;
   cout << "yks" << endl;
   if(head == NULL){
-    //head->value = num;
-    //head->next = NULL;
     head = newNode;
     return;
   }
@@ -113,13 +112,13 @@ void enqueue(char* num, Node* head){
 }
 
 void dequeue(Node* &head){
-  Node* temp = head->next->next;
-  delete(head->next);
-  head->next = temp;
+  Node* temp = head->next;
+  delete(head);
+  head = temp;
 }
 
 void push(char* operation, Node* &head){
-  Node* newNode = new Node();
+  Node* newNode = new Node(operation);
   newNode->value = operation;
   newNode->next = NULL;
   Node* temp = head->next;
