@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <vector>
 
 struct Node{
   char* value;
@@ -10,12 +11,28 @@ struct Node{
   }
 };
 
+struct TreeNode{
+  char* value;
+  TreeNode* right;
+  TreeNode* left;
+  TreeNode(char* newVal){
+    value = newVal;
+    right = NULL;
+    left = NULL;
+  }
+};
+
 void enqueue(char* num, Node* &head);
 void dequeue(Node* &head);
 void push(char* operation, Node* &head);
 Node* pop(Node* &sHead);
+char* peek(Node* head);
 int findPrecedence(char sign);
 void printIt(Node* aNode);
+void postfixToTree(Node* head, TreeNode* &root);
+void postToIn(TreeNode* root);
+void postToPre(TreeNode* root);
+void postToPost(TreeNode* root);
 
 using namespace std;
 
@@ -37,7 +54,7 @@ int main(){
   
   while(cin >> currChar){
     cout << "ran through ";
-    cout << *currChar << endl;
+    cout << currChar << endl;
 
     if(strcmp(currChar, "=")==0){
       break;
@@ -58,10 +75,12 @@ int main(){
       Node* current = stackHead;
       cout <<"printing stack ";
       printIt(stackHead);
-      while(strcmp(current->value, "(") !=0){
+      while(strcmp(peek(stackHead), "(") !=0){
 	enqueue(pop(stackHead)->value, queueHead);
+	printIt(queueHead);
 	cout << "looped" << endl;
       }
+      cout << "exited 2" << endl;
       cout << stackHead->value << endl;
       pop(stackHead);
     }else if(!isdigit(currChar[0])){
@@ -85,12 +104,79 @@ int main(){
   cout << "made it" << endl;
   printIt(queueHead);
   printIt(stackHead);
+
+  TreeNode* treeRoot = NULL;
+  postfixToTree(queueHead, treeRoot);
+  char* command = new char[20];
+  cout << "would you like to print to [infix, postfix, prefix]" << endl;
+  cin >> command;
+  if(strcmp(command, "infix") == 0){
+    postToIn(treeRoot);
+  }else if(strcmp(command, "postfix") == 0){
+    postToPost(treeRoot);
+  }else if(strcmp(command, "prefix") == 0){
+    postToPre(treeRoot);
+  }else{
+    cout << "you typed it wrong, make sure everything is in lowercase next time" << endl;
+  }
   return 0;
+}
+
+void postfixToTree(Node* head, TreeNode* &root){
+  vector<TreeNode*> treeStack;
+  Node* current = head;
+  while(current != NULL){
+    if(isdigit(current->value[0])){
+      treeStack.push_back(new TreeNode(current->value));
+    }else{
+      TreeNode* newTreeNode = new TreeNode(current->value);
+      newTreeNode->right = treeStack.back();
+      treeStack.pop_back();
+      newTreeNode->left = treeStack.back();
+      treeStack.pop_back();
+      treeStack.push_back(newTreeNode);
+    }
+    current = current->next;
+  }
+  root = treeStack[0];  
+      
+}
+
+void postToIn(TreeNode* root){
+  if(root != NULL){
+    if(!isdigit(root->value[0])){
+      cout << "(";
+    }
+    postToIn(root->left);
+    cout << root->value;
+    postToIn(root->right);
+    if(!isdigit(root->value[0])){
+      cout << ")";
+    }
+  }
+
+}
+
+void postToPre(TreeNode* root){
+  if(root != NULL){
+    cout << root->value << " ";
+    postToPre(root->left);
+    postToPre(root->right);
+  }
+}
+
+void postToPost(TreeNode* root){
+  if(root!= NULL){
+    postToPost(root->left);
+    postToPost(root->right);
+    cout << root->value << " ";
+    
+  }
 }
 void printIt(Node* aNode){
   Node* current = aNode;
   while(current != NULL){
-    cout << *current->value << " ";
+    cout << current->value << " ";
     current = current->next;
   }
   cout << endl;
@@ -112,16 +198,16 @@ int findPrecedence(char sign){
 }
 
 void enqueue(char* num, Node* &head){
-  cout <<*num<< endl;
+  cout <<num<< endl;
   cout << "yks" << endl;
   if(head == NULL){
-    Node* newNode = new Node(num);
+    Node* newNode = new Node(strdup(num));
     cout <<"head is empty" << endl;
     head = newNode;
     cout << "works" << endl;
     return;
   }else{
-    cout << *head->value << endl;
+    cout << head->value << endl;
     enqueue(num, head->next);
     
   }
@@ -146,7 +232,7 @@ void dequeue(Node* &head){
 }
 
 void push(char* operation, Node* &head){
-  Node* newNode = new Node(operation);
+  Node* newNode = new Node(strdup(operation));
   if(head == NULL){
     head = newNode;
     
@@ -166,3 +252,6 @@ Node* pop(Node* &sHead){
   return tbMoved;
 }
 
+char* peek(Node* head){
+  return head->value;
+}
