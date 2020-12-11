@@ -2,6 +2,7 @@
 #include <cstring>
 #include <vector>
 
+//node struct for the shunting yard stack and queue
 struct Node{
   char* value;
   Node* next;
@@ -11,6 +12,7 @@ struct Node{
   }
 };
 
+//node struct for the expression tree
 struct TreeNode{
   char* value;
   TreeNode* right;
@@ -22,6 +24,7 @@ struct TreeNode{
   }
 };
 
+//shunting yard functions
 void enqueue(char* num, Node* &head);
 void dequeue(Node* &head);
 void push(char* operation, Node* &head);
@@ -29,6 +32,8 @@ Node* pop(Node* &sHead);
 char* peek(Node* head);
 int findPrecedence(char sign);
 void printIt(Node* aNode);
+
+//expression tree functions
 void postfixToTree(Node* head, TreeNode* &root);
 void postToIn(TreeNode* root);
 void postToPre(TreeNode* root);
@@ -45,68 +50,68 @@ int main(){
   queueHead->value = NULL;
   queueHead->next = NULL;
   */
+
+  //initialization
   Node* queueHead = NULL;
   Node* stackHead = NULL;
   cout << "enter an equation with spaces between everything" << endl;
   cout << "please type an equals sign at the end so the program runs properly" << endl;
   cout << "example: 3 + 4 =" << endl;
   char* currChar = new char[80];
-  
-  while(cin >> currChar){
-    cout << "ran through ";
-    cout << currChar << endl;
 
+  //for shunting yard
+  while(cin >> currChar){
+    
     if(strcmp(currChar, "=")==0){
       break;
     }
-    //cout << *currChar << endl;
-    if(isdigit(currChar[0])){
+    
+    if(isdigit(currChar[0])){//checking if the current char is an int
       char* cc = strdup(currChar);
-      //cout << "working" << endl;
+
+      //enqueue the numbers
       enqueue(cc, queueHead);
-      cout << "printing new queue ";
-      printIt(queueHead);
-    }else if(strcmp(currChar, "(")== 0){
+      
+    }else if(strcmp(currChar, "(")== 0){//checking if it's an open parenthesis
       char* pa = strdup(currChar);
-      cout << "came here" << endl;
+
+      //just push it in the stack
       push(pa, stackHead);
-    }else if(strcmp(currChar, ")") == 0){
-      cout << "came here 2 " << endl;
+      
+    }else if(strcmp(currChar, ")") == 0){//checking if it's a closing parenthesis
       Node* current = stackHead;
-      cout <<"printing stack ";
-      printIt(stackHead);
-      while(strcmp(peek(stackHead), "(") !=0){
+      while(strcmp(peek(stackHead), "(") !=0){//until you reach the opening parenthesis, pop from stack and enqueue
 	enqueue(pop(stackHead)->value, queueHead);
-	printIt(queueHead);
-	cout << "looped" << endl;
+	
       }
-      cout << "exited 2" << endl;
-      cout << stackHead->value << endl;
+      //pop the opening parenthesis out
       pop(stackHead);
-    }else if(!isdigit(currChar[0])){
-      cout << "came here 3 " << endl;
-      while((stackHead !=NULL) &&
-          ((findPrecedence(stackHead->value[0]) > findPrecedence(currChar[0])) ||
-	   ((findPrecedence(stackHead->value[0]) == findPrecedence(currChar[0])) && currChar[0] != '^')) &&
-	    (stackHead->value[0] != '(')){
-	cout << "popping" << endl;
+      
+    }else if(!isdigit(currChar[0])){//if it's an operator
+      while((stackHead !=NULL) &&//if there is something in the stack and
+	    ((findPrecedence(stackHead->value[0]) > findPrecedence(currChar[0])) ||//if it takes precedence over the top of the stack or
+	     ((findPrecedence(stackHead->value[0]) == findPrecedence(currChar[0])) && currChar[0] != '^')) &&//if it has equal precedence and it's not power
+	    (stackHead->value[0] != '(')){//and it's not an opening parenthesis
+
+	//pop from the stack and enqueue in the queue
 	enqueue(pop(stackHead)->value, queueHead);
       }
+      //push the char in
       char* op = strdup(currChar);
-      cout << "Team" << endl;
       push(op, stackHead);
 	   
     }
   }
+  //get all the rest of the operators in the queue
   while(stackHead != NULL){
     enqueue(pop(stackHead)->value, queueHead);
   }
-  cout << "made it" << endl;
-  printIt(queueHead);
-  printIt(stackHead);
 
+  //create the expression tree
   TreeNode* treeRoot = NULL;
   postfixToTree(queueHead, treeRoot);
+
+  //ask for which fix it would like to convert to
   char* command = new char[20];
   cout << "would you like to print to [infix, postfix, prefix]" << endl;
   cin >> command;
@@ -122,6 +127,7 @@ int main(){
   return 0;
 }
 
+//converts from queue to tree
 void postfixToTree(Node* head, TreeNode* &root){
   vector<TreeNode*> treeStack;
   Node* current = head;
@@ -142,6 +148,7 @@ void postfixToTree(Node* head, TreeNode* &root){
       
 }
 
+//tree to infix
 void postToIn(TreeNode* root){
   if(root != NULL){
     if(!isdigit(root->value[0])){
@@ -157,6 +164,7 @@ void postToIn(TreeNode* root){
 
 }
 
+//tree to prefix
 void postToPre(TreeNode* root){
   if(root != NULL){
     cout << root->value << " ";
@@ -165,6 +173,7 @@ void postToPre(TreeNode* root){
   }
 }
 
+//tree to postfix
 void postToPost(TreeNode* root){
   if(root!= NULL){
     postToPost(root->left);
@@ -173,6 +182,8 @@ void postToPost(TreeNode* root){
     
   }
 }
+
+//print function for debugging
 void printIt(Node* aNode){
   Node* current = aNode;
   while(current != NULL){
@@ -182,6 +193,8 @@ void printIt(Node* aNode){
   cout << endl;
 
 }
+
+//finds precedence based off of pemdas
 int findPrecedence(char sign){
   if(sign == '-'){
     return 1;
@@ -197,40 +210,26 @@ int findPrecedence(char sign){
   return 5;
 }
 
+//enqueues
 void enqueue(char* num, Node* &head){
-  cout <<num<< endl;
-  cout << "yks" << endl;
   if(head == NULL){
     Node* newNode = new Node(strdup(num));
-    cout <<"head is empty" << endl;
     head = newNode;
-    cout << "works" << endl;
     return;
   }else{
-    cout << head->value << endl;
     enqueue(num, head->next);
     
   }
-  /*
-  cout <<"seg gaulting at " << newNode->value << endl;
-  while(current->next != NULL){
-    cout << "passes" << endl;
-    cout << "currVal "  << current->value<< endl;
-    current = current->next;
-    cout << "gone through" << endl;
-  }
-  current->next = newNode;
-  cout << current->value;
-  cout << " " << current->next->value;
-  */
 }
 
+//dequeues
 void dequeue(Node* &head){
   Node* temp = head->next;
   delete(head);
   head = temp;
 }
 
+//push function into a stack
 void push(char* operation, Node* &head){
   Node* newNode = new Node(strdup(operation));
   if(head == NULL){
@@ -243,8 +242,8 @@ void push(char* operation, Node* &head){
   }
 }
 
+//pop function for a stack
 Node* pop(Node* &sHead){
-  cout << sHead->value << endl;
   Node* newNext = sHead->next;
   Node* tbMoved = sHead;
   tbMoved->next= NULL;
@@ -252,6 +251,8 @@ Node* pop(Node* &sHead){
   return tbMoved;
 }
 
+
+//peek function
 char* peek(Node* head){
   return head->value;
 }
