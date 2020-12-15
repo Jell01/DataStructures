@@ -21,7 +21,7 @@ int search(Node* root, int num);
 void insert(Node* &head, Node* newLeaf);
 void print(Node* root, int spaces);
 void deleteNode(Node* &root, int num);
-
+Node* getSmallest(Node* root);
 int main(){
 
   //initialization
@@ -157,9 +157,20 @@ void deleteNode(Node* &root, int num){
     }
     else{
       
-      Node* temp = root->left;
-      root = root->right;
-      insert(root, temp);
+      //Node* temp = root->left;
+      //root = root->right;
+      //insert(root, temp);
+      Node* smallest = getSmallest(root->right);
+      root->value = smallest->value;
+      deleteNode(root->right, smallest->value);
     }
   }
+}
+
+Node* getSmallest(Node* root){
+  Node* current = root;
+  while(current != NULL && current->left !=NULL){
+    current = current->left;
+  }
+  return current;
 }
