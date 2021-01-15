@@ -182,7 +182,7 @@ void printTree(Node* root, int spaces){//prints the tree out in a shape
 
 void repairTree(Node* &newNode){//repairs the tree based on rules
   if(getParent(newNode) == NULL){//if the node is at the root, make it black
-    //  cout << "root" << endl;
+    //cout << "root" << endl;
     newNode->color = false;
   }
   else if(getParent(newNode)->color == false){//if the parent is black, dont do anything
@@ -199,6 +199,7 @@ void repairTree(Node* &newNode){//repairs the tree based on rules
   }
   else if(getColor(getUncle(newNode)) == false && getColor(getParent(newNode)) == true){//if u is black and p is red, rotate the tree
     //cout << "alt sides" << endl;
+    //cout << "N: " << newNode->val << " P: " << getParent(newNode)->val << " GP: " << getGrandParent(newNode)->val <<endl;
     if((getGrandParent(newNode)->left == getParent(newNode) && getParent(newNode)->right == newNode)){//if the parent is left node and the child is the right node
       //cout << "left right" << endl;
       Node* gp = getGrandParent(newNode);
@@ -227,15 +228,19 @@ void repairTree(Node* &newNode){//repairs the tree based on rules
 
       //rotate the tree
       if(nRight != NULL){
+	//cout << 1 << endl;
 	nRight->parent = p;
       }
+
       p->left = nRight;
       p->parent = newNode;
       newNode->right = p;
+      newNode->parent = gp;
       gp->right = newNode;
       repairTree(newNode->right);
+      //cout << 4 << endl;
       return;
-    }
+    } 
     //}
     //else if(getColor(newNode) == true && getColor(getParent(newNode)) == true && getColor(getUncle(newNode)) == false){
     //cout << "same side" <<endl;
