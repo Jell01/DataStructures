@@ -27,7 +27,7 @@ void normInsert(Node* head, Node* newNode);
 void printTree(Node* root, int spaces);
 Node* insert(Node* head, Node* newNode);
 void repairTree(Node* &newNode);
-
+Node* getHead(Node* currNode);
 int main(){
   char command[10];
   Node* head = NULL;
@@ -114,13 +114,23 @@ Node* insert(Node* head, Node* newNode){
   cout << "inserted" << endl;
   repairTree(newNode);
   cout << " repaired" << endl;
-  head= newNode;
-  while(getParent(head) != NULL){
-   head = getParent(head);
+  if(getParent(newNode) != NULL){
+    cout <<"p" << getParent(newNode)->val << endl;
   }
+  if(getUncle(newNode) != NULL){
+    cout << "u" <<getUncle(newNode)->val << endl;
+  }
+  cout << "n" <<newNode->val << endl;
+  head = getHead(newNode);
   return head;
 }
-
+Node* getHead(Node* currNode){
+  Node* current = currNode;
+  while(getParent(current) != NULL){
+    current = getParent(current);
+  }
+  return current;
+}
 void printTree(Node* root, int spaces){
   if (root == NULL)
       return;
@@ -162,13 +172,16 @@ void repairTree(Node* &newNode){
       Node* p = getParent(newNode);
       Node* nLeft = newNode->left;
       Node* pLeft = getParent(newNode)->left;
-      nLeft->parent = p;
-      p->right = nLeft;
+      if(nLeft != NULL){
+	nLeft->parent = p;
+	p->right = nLeft;
+      }
       p->parent = newNode;
       newNode->left = p;
       newNode->parent = gp;
       gp->left = newNode;
       repairTree(newNode->left);
+      return;
     }
     else if((getGrandParent(newNode)->right == getParent(newNode) && getParent(newNode)->left == newNode)){
       cout << "right left" << endl;
@@ -176,13 +189,15 @@ void repairTree(Node* &newNode){
       Node* p = getParent(newNode);
       Node* nRight = newNode->right;
       Node* pRight = getParent(newNode)->right;
-      nRight->parent = p;
-      p->left = nRight;
+      if(nRight != NULL){
+	nRight->parent = p;
+	p->left = nRight;
+      }
       p->parent = newNode;
       newNode->right = p;
       gp->right = newNode;
       repairTree(newNode->right);
-      
+      return;
     }
     //}
     //else if(getColor(newNode) == true && getColor(getParent(newNode)) == true && getColor(getUncle(newNode)) == false){
@@ -193,6 +208,7 @@ void repairTree(Node* &newNode){
       Node* gp = getGrandParent(newNode);
       Node* ggp = getParent(gp);
       Node* pRight = p->right;
+      cout <<"1. P: " << p->val << "GP: " << gp->val << endl;
       p->color = false;
       gp->color = true;
       if(ggp != NULL){
@@ -207,17 +223,22 @@ void repairTree(Node* &newNode){
       }else{
 	p->parent = NULL;
       }
+      cout <<"P: " << p->val << "GP: " << gp->val << endl;
       cout << 1 << endl;
       if(pRight != NULL){
 	pRight->parent = gp;
 	cout << 2 << endl;
 	gp->left = pRight;
       }
+      cout <<"P: " << p->val << "GP: " << gp->val << endl;
       cout << 3 << endl;
       gp->parent = p;
+      cout <<"P: " << p->val << "GP: " << gp->val << endl;
       cout << 4 << endl;
       p->right = gp;
-      printTree(p,0);
+      cout <<"P: " << p->val << "GP: " << gp->val <<" pLeft: " << p->left->val << " pRight: " << p->right->val << endl;
+
+      //printTree(p,0);
     }
     else if(getGrandParent(newNode)->right == newNode && getParent(newNode)->right == newNode){
       cout << "right right " << endl;
