@@ -392,8 +392,16 @@ void remNode(Node* &toDel){
 	      Node* sLeft = getSibling(toDel)->left;
 
 	      sLeft->parent = p;
-	      parent->right=sLeft;
+	      p->right=sLeft;
 
+	      s->parent = p->parent;
+	      if(p == p->parent->left){
+		p->parent->left = s;
+	      }
+	      else{
+		p->parent->right = s;
+	      }
+	      
 	      p->parent = s;
 	      s->left = p;
 	    }
@@ -404,6 +412,14 @@ void remNode(Node* &toDel){
 
 	      sRight->parent = p;
 	      p->left = sRight;
+
+	      s->parent = p->parent;
+              if(p == p->parent->left){
+                p->parent->left = s;
+              }
+              else{
+                p->parent->right = s;
+              }
 
 	      p->parent = s;
 	      s->right = p;
@@ -423,8 +439,212 @@ void remNode(Node* &toDel){
 	       && (getColor(getSibling(toDel)->left) == false) && (getColor(getSibling(toDel)->right) == true)){
 	      Node* s = getSibling(toDel);
 	      Node* srl = getSibling(toDel)->right->left;
+	      Node* sr = getSibling(toDel)->right;
+	      s->color = true;
+	      getSibling(toDel)->right->color = false;
+
+	      srl->parent = s;
+	      s->right = srl;
+
+	      s->parent = sr;
+	      sr->left = s;
+
+	      getParent(toDel)->left = sr;
+	      sr->parent = getParent(toDel);
+	    }
+	    else if((getSibling(toDel) == getParent(toDel)->right) && (getColor(getSibling(toDel)) == false)
+		    && (getColor(getSibling(toDel)->left) == true) && (getColor(getSibling(toDel)->right) == false)){
+	      Node* s = getSibling(toDel);
+	      Node* slr = getSibling(toDel)->left->right;
+	      Node* sl = getSibling(toDel)->left;
+
+	      s->color = true;
+	      getSibling(toDel)->left->color = false;
+
+	      slr->parent = s;
+	      s->left = slr;
+
+	      s->parent = sl;
+	      sl->right = s;
+
+	      getParent(toDel)->right = sl;
+	      sl->parent = getParent(toDel);
 	    }
 	  }
+	  if((getColor(getSibling(toDel)) == false) && (getColor(getSibling(toDel)->left) == true) && (getColor(toDel) == false) && (toDel == toDel->parent->right)){
+	    Node* p = getParent(toDel);
+	    Node* sr = getSibling(toDel)->right;
+	    Node* s = getSibling(toDel);
+	    s->color = p->color;
+	    p->color = false;
+	    s->left->color = false;
+
+	    sr->parent = p;
+	    p->left = sr;
+
+	    s->parent = p->parent;
+	    if(p == p->parent->left){
+	      p->parent->left = s;
+	    }
+	    else{
+	      p->parent->right = s;
+	    }
+
+	    s->right = p;
+	    p->parent = s;
+	  }
+	  else if((getColor(toDel) == false) && (getColor(getSibling(toDel)) == false) && (getColor(getSibling(toDel)->right) == true) && (toDel == toDel->parent->left)){
+	    Node* p = getParent(toDel);
+	    Node* sl = getSibling(toDel)->left;
+	    Node* s = getSibling(toDel);
+
+	    s->color = p->color;
+	    p->color = false;
+	    s->right->color = false;
+
+	    sl->parent = p;
+	    p->right = sl;
+
+	    s->parent = p->parent;
+            if(p == p->parent->left){
+              p->parent->left = s;
+            }
+            else{
+              p->parent->right = s;
+            }
+
+	    s->left = p;
+	    p->parent = s;
+	  }
+	}
+	else{
+	  Node* p = getParent(toDel);
+	  Node* s = getSibling(toDel);
+	  toDel = NULL;
+	  if(getColor(s) == true){
+            p->color = true;
+            s->color = false;
+            if(toDel == p->left){
+              Node* sLeft = s->left;
+
+              sLeft->parent = p;
+              p->right=sLeft;
+
+	      s->parent = p->parent;
+              if(p == p->parent->left){
+                p->parent->left = s;
+              }
+              else{
+                p->parent->right = s;
+              }
+
+              p->parent = s;
+              s->left = p;
+            }
+            else if(toDel == p->right){
+              Node* sRight = s->right;
+
+              sRight->parent = p;
+              p->left = sRight;
+
+	      s->parent = p->parent;
+              if(p == p->parent->left){
+                p->parent->left = s;
+              }
+              else{
+                p->parent->right = s;
+              }
+
+              p->parent = s;
+              s->right = p;
+            }
+          }
+
+	  if((p->color == false) && (getColor(s) == false) && (getColor(s->right) == false) && (getColor(s->left) == false)){
+            s->color = true;
+            remNode(p);
+          }
+          else if((p->color == true) && (getColor(s) == false) && (getColor(s->right) == false) && (getColor(s->left) == false)){
+            s->color = true;
+            p->color = false;
+            return;
+          }
+          else if(s->color == false){
+            if((s == p->left) && (getColor(s) == false)
+               && (getColor(s->left) == false) && (getColor(s->right) == true)){
+              Node* srl = s->right->left;
+              Node* sr = s->right;
+              s->color = true;
+              s->right->color = false;
+
+              srl->parent = s;
+              s->right = srl;
+
+              s->parent = sr;
+              sr->left = s;
+
+              p->left = sr;
+              sr->parent = p;
+            }
+            else if((s == p->right) && (getColor(s) == false)
+                    && (getColor(s->left) == true) && (getColor(s->right) == false)){
+              Node* slr = getSibling(toDel)->left->right;
+              Node* sl = getSibling(toDel)->left;
+
+              s->color = true;
+              s->left->color = false;
+
+              slr->parent = s;
+              s->left = slr;
+
+              s->parent = sl;
+              sl->right = s;
+
+              p->right = sl;
+              sl->parent = p;
+            }
+          }
+	  if((getColor(s) == false) && (getColor(s->left) == true) && (getColor(toDel) == false) && (toDel == p->right)){
+            Node* sr = s->right;
+            s->color = p->color;
+            p->color = false;
+            s->left->color = false;
+
+            sr->parent = p;
+            p->left = sr;
+
+            s->parent = p->parent;
+            if(p == p->parent->left){
+              p->parent->left = s;
+            }
+            else{
+              p->parent->right = s;
+            }
+
+            s->right = p;
+            p->parent = s;
+          }
+	  else if((getColor(toDel) == false) && (getColor(s) == false) && (getColor(s->right) == true) && (toDel == p->left)){
+            Node* sl = s->left;
+
+            s->color = p->color;
+            p->color = false;
+            s->right->color = false;
+
+            sl->parent = p;
+            p->right = sl;
+
+            s->parent = p->parent;
+            if(p == p->parent->left){
+              p->parent->left = s;
+            }
+            else{
+              p->parent->right = s;
+            }
+
+            s->left = p;
+            p->parent = s;
+          }
 	}
       }
     }
@@ -447,7 +667,11 @@ void remNode(Node* &toDel){
     }
   }
   else{
-
+    Node* current = toDel->left;
+    while(current->right != NULL){
+      current = current->right;
+    }
+    remNode(current);
   }
 }
 int debug(Node* head, int count) {//debug by adding a lot of numbers
