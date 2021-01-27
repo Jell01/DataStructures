@@ -347,12 +347,16 @@ void remNode(Node* &toDel){
     if(getColor(toDel) == true && getColor(toDel->right) == false){
       cout << "red, black" << endl;
       Node* temp = toDel->right;
-      delete(toDel->right);
-      toDel = temp;
-      //temp->parent = toDel->parent;
-      //toDel->right = NULL;
-      //toDel->val = temp->val;
-      //toDel->color = temp->color;
+      if(temp == NULL){
+	delete(toDel->right);
+	toDel = temp;
+      }
+      else{
+	temp->parent = toDel->parent;
+	toDel->right = NULL;
+	toDel->val = temp->val;
+        toDel->color = temp->color;
+      }
       return;
     }
     else if(getColor(toDel) == false && getColor(toDel->right) == true) {
@@ -380,7 +384,330 @@ void remNode(Node* &toDel){
       }
       else{
         if(toDel->right != NULL){
+	  cout << "right is not null" << endl;
 	  Node* temp = toDel->right;
+	  temp->parent = toDel->parent;
+	  toDel = temp;
+	  if(getColor(getSibling(toDel)) == true){
+	    cout << "sibling is red" << endl;
+	    toDel->parent->color = true;
+	    getSibling(toDel)->color = false;
+	    if(toDel == toDel->parent->left){
+	      cout <<"todel is the left node" << endl;
+	      Node* p = getParent(toDel);
+	      Node* s = getSibling(toDel);
+	      Node* sLeft = getSibling(toDel)->left;
+
+	      sLeft->parent = p;
+	      p->right=sLeft;
+
+	      s->parent = p->parent;
+	      if(p == p->parent->left){
+		p->parent->left = s;
+	      }
+	      else{
+		p->parent->right = s;
+	      }
+	      
+	      p->parent = s;
+	      s->left = p;
+	    }
+	    else if(toDel == toDel->parent->right){
+	      cout << "todel is the right node" << endl;
+	      Node* p =getParent(toDel);
+	      Node* s = getSibling(toDel);
+	      Node* sRight = getSibling(toDel)->right;
+
+	      sRight->parent = p;
+	      p->left = sRight;
+
+	      s->parent = p->parent;
+              if(p == p->parent->left){
+                p->parent->left = s;
+              }
+              else{
+                p->parent->right = s;
+              }
+
+	      p->parent = s;
+	      s->right = p;
+	    }
+	  }
+	  if((toDel->parent->color == false) && (getColor(getSibling(toDel)) == false) && (getColor(getSibling(toDel)->right) == false) && (getColor(getSibling(toDel)->left) == false)){
+	    cout << "case 3" << endl;
+	    getSibling(toDel)->color = true;
+	    remNode(toDel->parent);
+	  }
+	  else if((toDel->parent->color == true) && (getColor(getSibling(toDel)) == false) && (getColor(getSibling(toDel)->right) == false) && (getColor(getSibling(toDel)->left) == false)){
+	    cout << "case 4" << endl;
+	    getSibling(toDel)->color = true;
+	    getParent(toDel)->color = false;
+	    return;
+	  }
+	  else if(getSibling(toDel)->color == false){
+	    cout << "case 5" << endl;
+	    if((getSibling(toDel) == getParent(toDel)->left) && (getColor(getSibling(toDel)) == false)
+	       && (getColor(getSibling(toDel)->left) == false) && (getColor(getSibling(toDel)->right) == true)){
+	      Node* s = getSibling(toDel);
+	      Node* srl = getSibling(toDel)->right->left;
+	      Node* sr = getSibling(toDel)->right;
+	      s->color = true;
+	      getSibling(toDel)->right->color = false;
+
+	      srl->parent = s;
+	      s->right = srl;
+
+	      s->parent = sr;
+	      sr->left = s;
+
+	      getParent(toDel)->left = sr;
+	      sr->parent = getParent(toDel);
+	    }
+	    else if((getSibling(toDel) == getParent(toDel)->right) && (getColor(getSibling(toDel)) == false)
+		    && (getColor(getSibling(toDel)->left) == true) && (getColor(getSibling(toDel)->right) == false)){
+	      Node* s = getSibling(toDel);
+	      Node* slr = getSibling(toDel)->left->right;
+	      Node* sl = getSibling(toDel)->left;
+
+	      s->color = true;
+	      getSibling(toDel)->left->color = false;
+
+	      slr->parent = s;
+	      s->left = slr;
+
+	      s->parent = sl;
+	      sl->right = s;
+
+	      getParent(toDel)->right = sl;
+	      sl->parent = getParent(toDel);
+	    }
+	  }
+	  if((getColor(getSibling(toDel)) == false) && (getColor(getSibling(toDel)->left) == true) && (getColor(toDel) == false) && (toDel == toDel->parent->right)){
+	    cout << "case 6" << endl;
+	    Node* p = getParent(toDel);
+	    Node* sr = getSibling(toDel)->right;
+	    Node* s = getSibling(toDel);
+	    s->color = p->color;
+	    p->color = false;
+	    s->left->color = false;
+
+	    sr->parent = p;
+	    p->left = sr;
+
+	    s->parent = p->parent;
+	    if(p == p->parent->left){
+	      p->parent->left = s;
+	    }
+	    else{
+	      p->parent->right = s;
+	    }
+
+	    s->right = p;
+	    p->parent = s;
+	  }
+	  else if((getColor(toDel) == false) && (getColor(getSibling(toDel)) == false) && (getColor(getSibling(toDel)->right) == true) && (toDel == toDel->parent->left)){
+	    cout << "case 6 but right side" << endl;
+	    Node* p = getParent(toDel);
+	    Node* sl = getSibling(toDel)->left;
+	    Node* s = getSibling(toDel);
+
+	    s->color = p->color;
+	    p->color = false;
+	    s->right->color = false;
+
+	    sl->parent = p;
+	    p->right = sl;
+
+	    s->parent = p->parent;
+            if(p == p->parent->left){
+              p->parent->left = s;
+            }
+            else{
+              p->parent->right = s;
+            }
+
+	    s->left = p;
+	    p->parent = s;
+	  }
+	}
+	else{
+	  cout << "right is null" <<endl;
+	  Node* p = getParent(toDel);
+	  Node* s = getSibling(toDel);
+	  toDel = NULL;
+	  if(getColor(s) == true){
+	    cout << "red sibling" << endl;
+            p->color = true;
+            s->color = false;
+            if(toDel == p->left){
+	      cout << "toDel is the left child" << endl;
+              Node* sLeft = s->left;
+
+              sLeft->parent = p;
+              p->right=sLeft;
+
+	      s->parent = p->parent;
+              if(p == p->parent->left){
+                p->parent->left = s;
+              }
+              else{
+                p->parent->right = s;
+              }
+
+              p->parent = s;
+              s->left = p;
+            }
+            else if(toDel == p->right){
+	      cout << "toDel is right child" << endl;
+              Node* sRight = s->right;
+
+              sRight->parent = p;
+              p->left = sRight;
+
+	      s->parent = p->parent;
+              if(p == p->parent->left){
+                p->parent->left = s;
+              }
+              else{
+                p->parent->right = s;
+              }
+
+              p->parent = s;
+              s->right = p;
+            }
+          }
+
+	  if((p->color == false) && (getColor(s) == false) && (getColor(s->right) == false) && (getColor(s->left) == false)){
+	    cout << "case 3" << endl;
+	    s->color = true;
+            remNode(p);
+          }
+          else if((p->color == true) && (getColor(s) == false) && (getColor(s->right) == false) && (getColor(s->left) == false)){
+	    cout << " case 4 " << endl;
+	    s->color = true;
+            p->color = false;
+            return;
+          }
+          else if(s->color == false){
+	    cout << "case 5" << endl;
+            if((s == p->left) && (getColor(s) == false)
+               && (getColor(s->left) == false) && (getColor(s->right) == true)){
+	      cout << "s is black, sleft is black, sright is red" << endl;
+	      Node* srl = s->right->left;
+              Node* sr = s->right;
+              s->color = true;
+              s->right->color = false;
+
+              srl->parent = s;
+              s->right = srl;
+
+              s->parent = sr;
+              sr->left = s;
+
+              p->left = sr;
+              sr->parent = p;
+            }
+            else if((s == p->right) && (getColor(s) == false)
+                    && (getColor(s->left) == true) && (getColor(s->right) == false)){
+	      cout <<"s is right, but s=b,sl=b,sr=r" << endl;
+	      Node* slr = getSibling(toDel)->left->right;
+              Node* sl = getSibling(toDel)->left;
+
+              s->color = true;
+              s->left->color = false;
+
+              slr->parent = s;
+              s->left = slr;
+
+              s->parent = sl;
+              sl->right = s;
+
+              p->right = sl;
+              sl->parent = p;
+            }
+          }
+	  if((getColor(s) == false) && (getColor(s->left) == true) && (getColor(toDel) == false) && (toDel == p->right)){
+	    cout << "case 6" << endl;
+	    Node* sr = s->right;
+            s->color = p->color;
+            p->color = false;
+            s->left->color = false;
+
+            sr->parent = p;
+            p->left = sr;
+
+            s->parent = p->parent;
+            if(p == p->parent->left){
+              p->parent->left = s;
+            }
+            else{
+              p->parent->right = s;
+            }
+
+            s->right = p;
+            p->parent = s;
+          }
+	  else if((getColor(toDel) == false) && (getColor(s) == false) && (getColor(s->right) == true) && (toDel == p->left)){
+	    cout << "case 6 but todel is left " << endl;
+	    Node* sl = s->left;
+
+            s->color = p->color;
+            p->color = false;
+            s->right->color = false;
+
+            sl->parent = p;
+            p->right = sl;
+
+            s->parent = p->parent;
+            if(p == p->parent->left){
+              p->parent->left = s;
+            }
+            else{
+              p->parent->right = s;
+            }
+
+            s->left = p;
+            p->parent = s;
+          }
+	}
+      }
+    }
+  }
+  else if(toDel->right == NULL){
+    cout <<"right empty " << endl;
+    if(toDel->color == true && toDel->left->color == false){
+      cout << "rb" <<endl;
+      Node* temp = toDel->left;
+      temp->parent = toDel->parent;
+      delete(toDel->left);
+      toDel = temp;
+      return;
+    }
+    else if(toDel->color == false && toDel->left->color == true){
+      cout << "br" << endl;
+      Node* temp = toDel->left;
+      temp->parent = toDel->parent;
+      delete(toDel->left);
+      toDel=temp;
+      return;
+    }
+    else if(getColor(toDel) == false && getColor(toDel->right) == false) {
+      cout << "black black" << endl;
+      if(toDel->parent == NULL){
+	if(toDel->right != NULL){
+	  toDel->val = toDel->right->val;
+	  toDel->right = NULL;
+	}
+	else{
+	  toDel = NULL;
+	}
+	
+	return;
+      }
+      else{
+	cout << "right is NULL" << endl;
+        if(toDel->left != NULL){
+	  Node* temp = toDel->left;
 	  temp->parent = toDel->parent;
 	  toDel = temp;
 	  if(getColor(getSibling(toDel)) == true){
@@ -649,28 +976,12 @@ void remNode(Node* &toDel){
       }
     }
   }
-  else if(toDel->right == NULL){
-    cout <<"right empty " << endl;
-    if(toDel->color == true && toDel->left->color == false){
-      Node* temp = toDel->left;
-      temp->parent = toDel->parent;
-      delete(toDel->left);
-      toDel = temp;
-      return;
-    }
-    else if(toDel->color == false && toDel->left->color == true){
-      Node* temp = toDel->left;
-      temp->parent = toDel->parent;
-      delete(toDel->left);
-      toDel=temp;
-      return;
-    }
-  }
   else{
     Node* current = toDel->left;
     while(current->right != NULL){
       current = current->right;
     }
+    cout << "looking at: " << current->val << endl;
     remNode(current);
   }
 }
