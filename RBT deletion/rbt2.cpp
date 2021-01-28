@@ -42,7 +42,7 @@ int main(){
   Node* head = nullptr;
   ifstream numFile;
   while(true){
-    cout << "what would you like to do: [add,read,print]" << endl;
+    cout << "what would you like to do: [add,read,print,delete]" << endl;
     cin >> command;
     if(strcmp(command, "add") == 0){//if the user wants to add
       int num = 0;
