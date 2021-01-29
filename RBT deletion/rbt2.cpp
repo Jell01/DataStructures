@@ -30,6 +30,7 @@ void printTree(Node* root, int spaces);
 Node* insert(Node* head, Node* newNode);
 void findNode(Node* &head, int i, Node* &root);
 void remNode(Node* &toDel, bool editTree, Node* &head);
+bool search(Node* head, int i);
 //my own
 void repairTree(Node* &newNode);
 Node* getHead(Node* currNode);
@@ -42,7 +43,7 @@ int main(){
   Node* head = nullptr;
   ifstream numFile;
   while(true){
-    cout << "what would you like to do: [add,read,print,delete]" << endl;
+    cout << "what would you like to do: [add,read,print, delete,search]" << endl;
     cin >> command;
     if(strcmp(command, "add") == 0){//if the user wants to add
       int num = 0;
@@ -86,6 +87,18 @@ int main(){
       int toDel;
       cin>>toDel;
       findNode(head, toDel, head);
+    }
+    else if(strcmp(command, "search") == 0){
+      cout <<"what are you searching for?" << endl;
+      int toFind;
+      cin >> toFind;
+      bool found =search(head,toFind);
+      if(found){
+	cout << "in the tree" << endl;
+      }
+      else{
+	cout << "not in the tree" << endl;
+      }
     }
     else{
       cout << "invalid command, make sure everything is lowercase" << endl;
@@ -321,7 +334,23 @@ void repairTree(Node* &newNode){//repairs the tree based on rules
     }
   }
 }
-
+bool search(Node* head, int i){
+  if(head == NULL){
+    return false;
+  }
+  else if(head->val > i){
+    //cout << i << " is less than: " << head->val<< endl;
+    return search(head->left, i);
+  }
+  else if(head->val < i){
+    //cout << i << " is greater than: " << head->val << endl;
+    return search(head->right, i);
+  }else{
+    //cout << "found node: "<< head->val << endl;
+    return true;
+  }
+  return false;
+}
 void findNode(Node* &head, int i, Node* &root){
   //cout << head->val << " " << i <<endl;
   if(head->val > i){
