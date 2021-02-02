@@ -289,6 +289,9 @@ void findShortest(node** nodeList, int adjM[21][21]) {//uses dijkstra's algorith
   while((lastIndex+1 < 22) && (shortestPath[lastIndex+1] != NULL)){
     lastIndex ++;
   }
+  if(shortestPath[0] == NULL){
+    cout <<"no path";
+  }
   for(int i = lastIndex; i >= 0; i--) {
     cout << shortestPath[i]->name;
   }
